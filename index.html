@@ -78,6 +78,15 @@ button.big:hover{background:#6e1f14}
 .choices button:hover:not(:disabled){background:var(--ink);color:var(--paper)}
 .choices button:disabled{opacity:.45;cursor:not-allowed}
 .choices button small{display:block;font-size:13.5px;opacity:.75;font-style:italic}
+.opcions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+@media (max-width:560px){ .opcions{grid-template-columns:1fr} }
+.opcions .og{background:#efe3c4;border:1px solid #c9b48a;border-radius:6px;padding:8px 10px}
+.opcions .ot{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#7a5a34;margin-bottom:4px}
+.opcions label{display:block;padding:6px 2px;cursor:pointer;line-height:1.25}
+.opcions label small{display:block;margin-left:26px;font-size:13px;font-style:italic;opacity:.8}
+.opcions input{width:18px;height:18px;vertical-align:-3px;accent-color:#8f2a1c}
+.resum{background:#efe3c4;border-left:4px solid #a88d5c;border-radius:3px;padding:6px 12px;margin:10px 0;font-size:14.5px}
+.resum ul{margin:4px 0 0 18px;padding:0}.resum li{margin:2px 0}
 .choices button.mare{border:2px solid #5f7a3e;background:#eef2dc}
 .mtip{display:block;font-size:13.5px;color:#43602a;margin-top:3px}
 .choices button.mare:hover:not(:disabled) .mtip{color:var(--paper)}
@@ -603,7 +612,7 @@ footer{color:#cdbb95;font-size:13px;text-align:center;margin:14px 0 4px;font-sty
         <p><b>Al final</b> escriviu el quadern «Obres de Sapeyra» per als successors, i veureu què va passar de debò.</p>
         <p><b>Terres i bestiar:</b> a la pestanya «Terres i bestiar» hi ha com es conreava el terme: l'heretat de la Torre (una part sembrada i l'altra en guaret), el calendari de l'any, qui portava cada delme i on, el ramat i com han anat les collites, i les festes i els pagaments de l'any. És només informativa: no s'hi decideix res. A la pestanya «Castell» hi ha les devocions i les obligacions religioses de la casa.</p>
         <p><b>Comptes:</b> a la pestanya «Comptes» veureu, cada any, d'on venen les rendes (delmes, heretat de la Torre, molí, quístia, censos, censals, forn, seguers, bestiar…) i què consumeix la casa. Cap any no és igual: depèn de la collita i de la sort.</p>
-        <p><b>La puntuació final</b> és sobre 100 i té nou parts: la lleialtat dels vassalls (fins a 20 punts), el quadern per als successors (fins a 15: 2 punts per cada projecte que es va fer de debò, 5 més si hi poseu el molí com a primera obra, i en perdeu 1 per cada un que no consta que es fes), les obres del castell (fins a 10), la <b>defensa del castell als assalts</b> de 1642 i 1649 (fins a 10: com més resistència hi oposeu, amb obres, armes, blat i vassalls lleials, més punts), la devoció (un punt per cada 3, fins a 10), les pàgines del llibre de memòries (un punt cada 4,5 pàgines, fins a 10), com us hàgiu defensat de Rocabruna al procés (fins a 10), els diners que deixeu al vostre fill (un punt per cada 60 lliures, fins a 10) i les millores del terme (fins a 5). Al final, el joc us dona un consell per a la propera partida.</p>
+        <p><b>La puntuació final</b> és sobre 100 i té nou parts: la lleialtat dels vassalls (fins a 20 punts), el quadern per als successors (fins a 15: 2 punts per cada projecte que es va fer de debò, 5 més si hi poseu el molí com a primera obra, i en perdeu 1 per cada un que no consta que es fes), les obres del castell (fins a 10), la <b>defensa del castell als assalts</b> de 1642 i 1649 (fins a 10: com més resistència hi oposeu, amb obres, armes, blat i vassalls lleials, més punts), la devoció (un punt per cada 3, fins a 10; a la partida curta, per cada 2,8), les pàgines del llibre de memòries (un punt cada 4,5 pàgines, fins a 10; a la partida curta, cada 3,7), com us hàgiu defensat de Rocabruna al procés (fins a 10), els diners que deixeu al vostre fill (un punt per cada 60 lliures, fins a 10) i les millores del terme (fins a 5). Al final, el joc us dona un consell per a la propera partida.</p>
         <p><b>Millores al terme:</b> abans de la guerra, cada any podeu fer una millora agrícola de les que Joseph va deixar escrites (una heretat nova a Sarrui, regar l'heretat de la Torre, ovelles, olivers, arbres per a fusta, canemars). Costen diners però fan créixer les rendes; algunes triguen anys a donar fruit. Les veureu al mapa del terme.</p>
         <p><b>Blat:</b> a la cambra del castell hi caben 250 quarteres; el que sobri es fa malbé. Val més vendre'l a temps.</p>
         <p><b>Defensa</b> depèn de les obres, les armes, el blat guardat i la lleialtat dels vassalls. A l'<b>Arxiu</b> s'hi van desant els documents que trobeu.</p>
@@ -713,10 +722,12 @@ function millActiva(id){ const m=S.millores&&S.millores[id]; if(!m) return false
 function millDesde(id){ const m=S.millores[id], M=MILLORES.find(x=>x.id===id); return m.y+M.anys; }
 function obraCost(o){ return millActiva("arbres")?Math.round(o.cost*0.95):o.cost; }
 function millCost(c){ return (S.llibres&&S.llibres.includes("agusti"))?Math.round(c*0.9):c; }
-function milloraOk(){ return S.phase==="pau" && !S.milloraAny; }
+function obresMax(){ return S&&S.dobleAny?4:2; }
+function millMax(){ return S&&S.dobleAny?2:1; }
+function milloraOk(){ return S.phase==="pau" && (S.milloraAny|0)<millMax(); }
 function millora(id){
   const M=MILLORES.find(x=>x.id===id); if(!M||millFeta(id)||!milloraOk()) return;
-  const fer=(cost,opt,txt,d)=>{ cost=millCost(cost); S.lliures-=cost; S.millores[id]={y:S.year,opt:opt||""}; S.milloraAny=true; addDoc("terme");
+  const fer=(cost,opt,txt,d)=>{ cost=millCost(cost); S.lliures-=cost; S.millores[id]={y:S.year,opt:opt||""}; S.milloraAny=(S.milloraAny|0)+1; addDoc("terme");
     log(`Millora al terme: ${M.nom} (${cost} ll). ${M.anys>1?`Donarà fruit a partir del ${S.year+M.anys}.`:"Donarà fruit l'any vinent."}`);
     millAnim(id); return res(txt+`<p class="note">${M.anys>1?`Donarà fruit a partir del ${S.year+M.anys}.`:"Donarà fruit a partir de l'any vinent."} Ho veureu a «Comptes» i a «El terme».</p>`,Object.assign({lliures:-cost},d||{})); };
   const C={
@@ -759,7 +770,8 @@ function fresh(){
     b:{cn1:false,cn2:false,garites:false,reixes:false,muralla:false,torre:false,seguers:false},
     built:[], ruined:{}, moli:"ok", forn:"ok", moliRenda:20, holder:"sulla",
     obresAny:0, actionAny:false, docs:["concordia"], deute:0, log:[], flags:{}, damage:{}, fires:[],
-    projectes:[], score:null, warStart:false, sospita:0, plet:null, vass:null, rector:60
+    projectes:[], score:null, warStart:false, sospita:0, plet:null, vass:null, rector:60,
+    mode:"completa", batalles:"si"
   };
 }
 
@@ -793,9 +805,10 @@ function pushEv(e){ queue.push(e); }
 function nextEv(){
   if(S){ if(S._sv===undefined) S._sv=S.sospita||0;
     if((S.sospita||0)!==S._sv && !ANIM_BUSY && typeof animSospita==="function"){ const a=S._sv, b=S.sospita||0; S._sv=b; $("modal").classList.remove("on"); showcase(()=>animSospita(a,b)).then(()=>nextEv()); return; } }
-  if(!queue.length){ $("modal").classList.remove("on"); render(); if(window._afterEv){ const f=window._afterEv; window._afterEv=null; f(); } return; }
+  if(!queue.length){ $("modal").classList.remove("on"); render(); if(window._afterEv){ const f=window._afterEv; window._afterEv=null; f(); } if(S&&S._passa) curtaPassa(); return; }
   const e=queue.shift();
   if(e.when && !e.when()) return nextEv();
+  if(curtaResol(e)) return nextEv();
   showEv(e);
 }
 /* ---------- MARQUES: ≈ aproximat · ◇ no documentat ----------
@@ -828,7 +841,8 @@ function showEv(e){
   h+=`<div class="choices" id="ch"></div>`;
   sh.innerHTML=h;
   const ch=$("ch");
-  const choices=e.choices||[{l:"Continuar",f:()=>""}];
+  let choices=e.choices||[{l:"Continuar",f:()=>""}];
+  if(S.batalles==="no"){ const sb=choices.filter(c=>!/Jugar la batalla/.test(c.l||"")); if(sb.length) choices=sb; }
   choices.forEach(c=>{
     const b=document.createElement("button");
     const ok=!c.cond||c.cond();
@@ -852,6 +866,69 @@ function showEv(e){
   });
   $("modal").classList.add("on");
   render();
+}
+
+/* ---------- PARTIDA CURTA ----------
+   45 fets essencials es mostren sencers. La resta d'esdeveniments de l'any es resolen sols
+   (la tria que deixa millor la casa, amb els pesos del bot «equilibrat») i surten resumits
+   al següent esdeveniment que es mostra. No hi ha esdeveniments a l'atzar.
+   Els esdeveniments que provoca el jugador (millores, obres…) es mostren sempre. */
+const CURTA_ESS=new Set([
+ "Mor Jaume Sulla","La mare administra la casa",                                   // 1624
+ "Administreu la casa",                                                             // 1627
+ "Una hereva a Talarn","Casament amb Elena Sirera",                                 // 1628
+ "Llamp a la torre",                                                                // 1629
+ "Un any de fam","Mor Elena Sulla",                                                 // 1631
+ "Les Corts de Barcelona",                                                          // 1632
+ "Una pubilla a Tremp","Casament amb Francesca de Gassol",                          // 1633
+ "Neix Francesc, l'hereu",
+ "El capbreu de Sapeira",                                                           // 1636
+ "Conseller en cap de Tremp",                                                       // 1638
+ "El plet de Talarn",                                                               // 1639
+ "Comença la guerra dels Segadors","Comença la guerra",                             // 1640 (un o l'altre)
+ "La guarda del castell","El motí de la Collada","El llamp de la cisterna",         // 1641
+ "Els miquelets cremen el molí","Rocabruna i les cartes d'Aragó","Arriba Martín de Azlor","El setge de Martín de Azlor","Primera anada a Barcelona", // 1642
+ "Les claus del castell","Parlaments al pont de Montanyana","On es guarda la pólvora?","L'explosió","Francesca hereta el Mahull", // 1643
+ "Segona anada a Barcelona","Cau el castell de Sapeira",                            // 1644
+ "Retinguts a Barcelona","A la presó",                                              // 1645
+ "El procés","La sentència",                                                        // 1646
+ "La remissió","Mor Francesca Gassol",                                              // 1647
+ "Sapeira recuperada","Rocabruna no us deixa entrar","Què va passar mentre éreu fora", // 1648
+ "Tornen els castellans","Segona captura",                                          // 1649
+ "El deute dels vassalls","Obres de Sapeyra"                                        // 1650
+]);
+const CURTA_SEMPRE=new Set(["Deutes","Abans de marxar"]);
+function curtaPassa(){ // partida curta: els anys de pau passen de dos en dos
+  if(typeof ANIM_BUSY!=="undefined"&&ANIM_BUSY){ setTimeout(curtaPassa,200); return; }
+  if(!S._passa||$("modal").classList.contains("on")) return;
+  if(S.preu!==2){ S._passa=false; S.dobleAny=false; render(); return; } // aquest any hi ha un preu especial del blat: el jugador el juga
+  S._passa=false; log(`Partida curta: l'any ${S.year} passa sol i continueu el ${S.year+1}. Aquest any podreu fer el doble d'obres i de millores.`);
+  endYear(); }
+function curtaVal(){ let d=0; try{ d=defensa(); }catch(e){}
+  return S.lliures+2*S.blat+10*S.lleialtat+12*S.devocio+10*S.memories-60*(S.sospita||0)+15*d+1.5*(S.rector||0); }
+function curtaResol(e){
+  if(!S||S.mode!=="curta"||!e._any||e.custom||CURTA_ESS.has(e.title)||CURTA_SEMPRE.has(e.title)) return false;
+  const all=e.choices||[{l:"Continuar",f:()=>""}];
+  const cand=all.filter(c=>(!c.cond||c.cond())&&!/__hold__|jugaBatalla|showSetge|festeig|showProjectes|finale/.test(String(c.f||"")));
+  if(!cand.length) return false;
+  let best=cand[0];
+  if(cand.length>1){
+    const S0=structuredClone(S), Q0=queue.slice(), st={};
+    ["render","sfx","sealToast","fxDelta","setView","setSeason","pushFront","pushEv"].forEach(k=>{ if(typeof window[k]==="function"){ st[k]=window[k]; window[k]=()=>{}; } });
+    const sT=window.setTimeout; window.setTimeout=()=>0; let bv=-1e12;
+    for(const c of cand){ let v=-1e12; try{ c.f&&c.f(); v=curtaVal(); }catch(err){} S=structuredClone(S0); queue=Q0.slice(); if(v>bv){ bv=v; best=c; } }
+    window.setTimeout=sT; for(const k in st) window[k]=st[k]; S=S0; queue=Q0;
+  }
+  const c0=S.collita, p0=S.preu, d0=S.devocio, n0=queue.length;
+  const sT2=window.setTimeout; window.setTimeout=(fn,ms,...x)=>/showcase/.test(String(fn))?0:sT2(fn,ms,...x); // sense l'animació
+  let r=""; try{ r=best.f?best.f():""; }catch(err){ r=""; }
+  window.setTimeout=sT2;
+  queue.forEach(q=>{ if(q._any===undefined) q._any=true; });
+  if(S.devocio>d0){ S.devLog=S.devLog||[]; S.devLog.push({y:S.year,t:e.title||"",l:String(best.l||"").replace(/<[^>]+>/g,"")}); }
+  if(S.collita!==c0||S.preu!==p0){ S.agri=S.agri||{}; S.agri[S.year]={t:e.title,c:S.collita,p:S.preu}; }
+  if(e.doc) addDoc(e.doc);
+  S.curtaN=(S.curtaN||0)+1; // no es mostra enlloc: el jugador de la curta no ha de saber què s'ha saltat
+  return true;
 }
 function res(text,d){ const dl=d?delta(d):""; return text+(dl?`<div class="delta">${dl}</div>`:""); }
 
@@ -931,6 +1008,7 @@ function startYear(){
   if(S.year===1624&&!(S.flags&&S.flags.gcStart)){ S.flags=S.flags||{}; S.flags.gcStart=1; if(typeof gcEv==="function") gcEv("partida-comencada","Partida començada"); }
   started=true; if(typeof herdReset==="function"){ herd.inside=false; herdReset(); } if(typeof setView==="function") setView("poble");
   S.obresAny=0; S.actionAny=false; S.milloraAny=false; S.fires=[];
+  { const c=S.mode==="curta"; S._passa=c&&S.year%2===1&&S.year>=1625&&S.year<=1637; S.dobleAny=c&&S.year%2===0&&S.year>=1626&&S.year<=1638; }
   S._delme=0; if(S.year>1624) income();
   const y=S.year;
   if(y<1640) S.phase="pau";
@@ -939,10 +1017,12 @@ function startYear(){
   else if(y===1648) S.phase="recuperat";
   else S.phase="exili2";
   const q0=queue.length; fixedEvents(y); pauEvents(y); mahullEvents(y); vidaEvents(y); vassEvents(y); famNaix(y); const nf=queue.length-q0;
-  if(y>1624 && y<1640 && nf<3 && Math.random()<(nf?0.4:0.7)){ const re=randomEvent(); if(re) pushEv(re); }
+  if(S.mode!=="curta" && y>1624 && y<1640 && nf<3 && Math.random()<(nf?0.4:0.7)){ const re=randomEvent(); if(re) pushEv(re); }
   if(S.lliures<0){ pushEv({title:"Deutes",text:"La casa té deutes. Haureu de vendre un censal per pagar-los.",choices:[{l:"Vendre un censal",f:()=>{const d=-S.lliures; S.lliures=0; S.lleialtat=clamp(S.lleialtat-3,0,100); return res(`Pagueu ${d} lliures de deutes. Als vassalls no els agrada veure que la casa s'empobreix.`,{lleialtat:0});}}]}); }
+  queue.forEach(e=>e._any=true);
   setSeason(null);
-  if(S._delme>0 && typeof animDelme==="function") showcase(()=>animDelme(S._delme)).then(()=>nextEv()); else nextEv();
+  const veureDelme=S._delme>0 && typeof animDelme==="function" && !(S.mode==="curta"&&S.flags.delmeVist);
+  if(veureDelme){ S.flags.delmeVist=1; showcase(()=>animDelme(S._delme)).then(()=>nextEv()); } else nextEv();
 }
 
 function endYear(){
@@ -1174,7 +1254,7 @@ function mahullEvents(y){
    Madalena Sulla administra la hisenda des de la mort de Jaume (2-VII-1624) fins a l'agost del 1627 (Llibre de memòries, f. 25). */
 function mareOn(){ return !!S && S.year<1627 && S.phase==="pau" && S.flags.mare!==false; }
 function mareObra(){
-  if(S.obresAny>=2) return null;
+  if(S.obresAny>=obresMax()) return null;
   const by=id=>OBRES.find(o=>o.id===id), can=id=>{ const o=by(id); return !S.b[id]&&o.req(S)&&S.lliures>=o.cost; };
   // Primer, obres petites: els seguers i després les que no demanen el castell nou (21/11, Gabriel)
   if(can("seguers")) return {id:"seguers",why:"costa poc i cada any us donarà cera i mel (+18 lliures)"};
@@ -1210,7 +1290,7 @@ function mareVenda(){
 function mareText(){
   const o=mareObra(), p=[];
   if(o) p.push(`Feu l'obra <b>${OBRES.find(x=>x.id===o.id).nom}</b>: ${o.why}.`);
-  else if(S.obresAny>=2) p.push("Aquest any ja heu fet prou obres.");
+  else if(S.obresAny>=obresMax()) p.push("Aquest any ja heu fet prou obres.");
   else if(!S.b.cn1&&S.b.muralla&&S.b.torre) p.push(`Estalvieu per a la primera fase del castell nou (600 lliures): encara us en falten ${Math.max(0,600-S.lliures)}.`);
   else if(!S.b.cn1) p.push("Aquest any no gasteu més: guardeu les lliures per a les obres petites de l'any que ve.");
   else p.push("Aquest any no us convé gastar més en obres: guardeu alguna cosa per als imprevistos.");
@@ -1318,7 +1398,8 @@ function fixedEvents(y){
       choices:[{l:"Fer pujar el bestiar a la muntanya",s:"Els pastors no hi seran per defensar el lloc",f:()=>{S.flags.bestiar=true; setTimeout(()=>showcase(()=>herdTo("muntanya")),50); return res("Els pastors s'enduen el bestiar terme amunt, lluny del camí d'Aragó.",{lleialtat:2});}},
                {l:"Tancar el bestiar a prop del castell",f:()=>{S.flags.bestiar=false; setTimeout(()=>showcase(()=>herdTo("castell")),50); return res("El bestiar queda als corrals de sota el castell.");}}]});
     pushEv({date:"12 de juliol de 1642", title:"El setge de Martín de Azlor", text:()=>siege1642Text(), src:"Llibre de memòries, img. 12–13, 19, 44; f. 7 i 146",
-      choices:[{l:"Veure què en queda",f:()=>siege1642()}]});
+      choices:[{l:"⚔ Jugar la batalla",s:"Prototip en 2.5D: porteu vós la defensa amb les armes i la pólvora que teniu",f:()=>{ jugaBatalla(1642,{m:Math.min(20,S.mosquets||0),a:10,pc:4,va:Math.min(30,S.arcabussos||0),vs:8,p:polBat(),ramat:S.flags.bestiar?0:1},r=>acabaBatalla(r,()=>siege1642())); return "__hold__"; }},
+               {l:"Veure què en queda",f:()=>siege1642()}]});
     pushEv({date:"Setembre de 1642", title:"Primera anada a Barcelona", doc:"rocabruna",
       text:"Al cap de dos mesos, el governador de Catalunya us escriu que «convenia al servey del rey» que aneu de seguida a Barcelona. És com fan anar a la ciutat els que tenen per mal afectes. Al darrere hi ha Rocabruna.",
       quote:"«…que era lo modo tenien pera fer anar alla los que tenien per mal affectes.»", src:"Llibre de memòries, img. 12, f. 7",
@@ -1362,7 +1443,10 @@ function fixedEvents(y){
       choices:[{l:"Obeir i anar a Barcelona",s:"El que va fer Joseph",f:()=>{ pushFront(prep1644()); return res("Abans de marxar, cal deixar les coses de casa en ordre."); }},
                {l:"Demanar l'ordre per escrit",s:"Rocabruna no la podrà ensenyar…",f:()=>{ S.sospita+=2; pushFront(prep1644()); return res("Rocabruna no té cap ordre escrita, però us acusa de desobeir el virrei. Al final haureu d'anar a Barcelona igualment, i amb més sospita."); }}]});
     pushEv({date:"18 de novembre de 1644", title:"Cau el castell de Sapeira", doc:"inventari", text:()=>fall1644Text(), src:"Llibre de memòries, img. 13–14, 19–20",
-      choices:[{l:"Continuar",f:()=>fall1644()}]});
+      choices:[{l:"⚔ Jugar la batalla",s:"Prototip en 2.5D: com hauria pogut anar la defensa sense vós, amb les armes, la pólvora i el blat que hi ha",f:()=>{ jugaBatalla(1644,{m:Math.min(20,S.mosquets||0),a:Math.min(30,S.arcabussos||0),p:polBat(),vs:12,blat:Math.max(0,Math.min(400,Math.round(S.blat||0)))},r=>acabaBatalla(r,()=>{
+                 const salv=r&&r.blat>0?Math.min(r.blat,S.blat):0; S.blat-=salv; const out=fall1644(); if(!salv) return out; S.blat+=salv;
+                 return out+`<p>Però abans que tallessin el camí, els vassalls han tret <b>${salv} quarteres de blat</b> cap a Tremp: les conserveu.</p>`; })); return "__hold__"; }},
+               {l:"Continuar",f:()=>fall1644()}]});
   }
   if(y===1645){
     pushEv({date:"9 de juny de 1645 · Barcelona", title:"Retinguts a Barcelona", doc:"proces",
@@ -1411,7 +1495,7 @@ function fixedEvents(y){
     pushEv({date:"Finals d'abril de 1648 · Puigcerdà", title:"Sapeira recuperada", doc:"relacio",
       text:"Fa sis dies que sou a Puigcerdà quan us arriba la notícia. El dia de Sant Marc, catalans i francesos han recuperat Sapeira.\n\nL'imprès que es ven a Barcelona ho explica. Josep de Rocabruna va fer veure que atacava el Pont de Suert i de nit va anar a Sapeira per la muntanya. Va atacar la vila per quatre parts. Els castellans es van tancar al castell i els naturals a l'església, que Rocabruna va fer foradar. Després d'una bretxa al castell nou, una mina sota la torre va obligar el governador castellà a rendir-se, el dissabte 25 d'abril.",
       quote:"«…que de aquest Castell de Sapeyra, los enemichs ne feyan gran estimacio, donantlo per inpenetrable.»", src:"Relació verdadera, Barcelona, 1648; Llibre de memòries, img. 16",
-      choices:[{l:"▶ Veure com va ser el setge (animació)",s:"Pas a pas, a partir de la Relació",f:()=>{S.holder="catalans"; showSetge(()=>nextEv()); return "__hold__";}},{l:"Fer dir una missa a Sant Marc",f:()=>{S.holder="catalans"; return res("Sant Marc serà, des d'ara, un dels sants de la casa.",{devocio:2,lliures:-5});}},{l:"Continuar",f:()=>{S.holder="catalans"; return "";}}]});
+      choices:[{l:"▶ Veure com va ser el setge (animació)",s:"Pas a pas, a partir de la Relació",f:()=>{S.holder="catalans"; showSetge(()=>nextEv()); return "__hold__";}},{l:"⚔ Jugar la batalla",s:"Prototip en 2.5D: porteu vós l'atac de Rocabruna",f:()=>{S.holder="catalans"; jugaBatalla(1648,{},r=>acabaBatalla(r,null)); return "__hold__";}},{l:"Fer dir una missa a Sant Marc",f:()=>{S.holder="catalans"; return res("Sant Marc serà, des d'ara, un dels sants de la casa.",{devocio:2,lliures:-5});}},{l:"Continuar",f:()=>{S.holder="catalans"; return "";}}]});
     pushEv({date:"Estiu de 1648 · Pons", title:"Rocabruna no us deixa entrar", doc:"rocabruna",
       text:"El virrei us fa sortir de Barcelona mentre duri la campanya, i passeu l'estiu a Pons. Rocabruna «continuant lo perseguirme» no us deixa prendre possessió de Sapeira ni cobrar-ne les rendes. Una carta del regent en nom del Consell Reial no n'hi ha prou.",
       src:"Llibre de memòries, img. 16, f. 11",
@@ -1429,7 +1513,7 @@ function fixedEvents(y){
   }
   if(y===1649){
     pushEv({date:"17 de febrer de 1649 · la Seu d'Urgell", title:"Tornen els castellans", doc:"enderroc", text:()=>fall1649Text(), src:"Llibre de memòries, img. 17 i 44",
-      choices:[{l:"Continuar",f:()=>fall1649()}]});
+      choices:[{l:"⚔ Jugar la batalla",s:"Prototip en 2.5D: com hauria pogut anar la defensa, amb les armes, la pólvora i les obres que teniu",f:()=>{ jugaBatalla(1649,{m:Math.min(20,S.mosquets||0),a:Math.min(30,S.arcabussos||0),p:polBat(),g:10,corrals:S.flags.corrals?1:0},r=>acabaBatalla(r,()=>fall1649())); return "__hold__"; }},{l:"Continuar",f:()=>fall1649()}]});
     pushEv({date:"20 de setembre de 1649", title:"Segona captura", doc:"desterro",
       text:"A la Seu d'Urgell, sense haver-ne donat cap motiu, el veguer us deté per ordre del Consell Reial i del governador. Us té 22 dies al palau del bisbe, amb quatre guardes de dia i de nit i obligat sota pena de 2.000 lliures a no sortir-ne. Ningú no us ve a veure.\n\nEl 13 d'octubre arriba l'ordre: heu d'anar a viure al Rosselló. A Puigcerdà, el veguer us dona dotze hores per sortir de tota la Cerdanya, sota pena de confiscació.",
       src:"Llibre de memòries, img. 17, f. 12",
@@ -1448,6 +1532,32 @@ function fixedEvents(y){
   }
 }
 function pushFront(e){ queue.unshift(e); }
+
+/* ---------- BATALLES JUGABLES (prototips 2.5D de la carpeta batalla/) ----------
+   S'obren a sobre del joc en un iframe amb les dades de la partida (?joc=1&...).
+   La batalla avisa amb postMessage: {tipus:"sapeira-batalla",...} en acabar i
+   {tipus:"sapeira-batalla-tanca"} quan es vol tornar al joc. La història no canvia:
+   el resultat es mostra i es desa a S.flags["batalla"+any]. */
+function jugaBatalla(any,params,done){
+  const q=new URLSearchParams(Object.assign({joc:1},params)).toString();
+  const ov=document.createElement("div"); ov.style.cssText="position:fixed;inset:0;z-index:99999;background:#2b2117";
+  ov.innerHTML=`<iframe src="batalla/batalla_${any}.html?${q}" style="width:100%;height:100%;border:0;display:block"></iframe><div id="batErr" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#f4ead0;font:18px Georgia;text-align:center;padding:20px">No s'ha pogut obrir la batalla (falta el fitxer batalla/batalla_${any}.html).<br><br><button class="b" id="batTanca">Torna al joc</button></div>`;
+  document.body.appendChild(ov); let res=null, fet=false;
+  const tanca=r=>{ if(fet) return; fet=true; removeEventListener("message",on); ov.remove(); done(r); };
+  const on=e=>{ const d=e.data||{}; if(+d.any!==any) return; if(d.tipus==="sapeira-batalla") res=d; if(d.tipus==="sapeira-batalla-tanca") tanca(d.acabada?Object.assign({},res,d):null); };
+  addEventListener("message",on);
+  const ifr=ov.querySelector("iframe"); ifr.onload=()=>{ try{ if(!ifr.contentWindow.SIM) throw 0; }catch(e){ if(e===0){ ov.querySelector("#batErr").style.display="flex"; ov.querySelector("#batTanca").onclick=()=>tanca(null); } } };
+}
+function resumBatalla(r){
+  if(!r) return `<p class="note">Heu deixat la batalla sense acabar.</p>`;
+  S.flags["batalla"+r.any]=r; const n=x=>String(x).replace(".",",");
+  const t=r.any===1644?`els castellans entren a les <b>${String(Math.floor(r.hora))+"."+String(Math.round((r.hora%1)*60)).padStart(2,"0")} h</b>${r.blat?` · heu salvat ${r.blat} quarteres de blat`:""}`:r.any===1649?`heu resistit <b>${n(r.dies)} dies</b> (el setge de veritat en va durar 8)`:r.any===1648?`el castell es rendeix al cap de <b>${n(r.dies)} dies</b> (a la història, uns 2,4)`:(r.perills===0?"<b>defensa ferma</b>: no han estat mai a punt d'entrar":`han estat <b>${r.perills} vegades</b> a punt d'entrar`);
+  log("Batalla jugada ("+r.any+"): "+t.replace(/<[^>]+>/g,"")+".");
+  return `<div class="quote">⚔ La vostra batalla: ${t} · ${r.mortsD} morts dels vostres.</div>`;
+}
+function acabaBatalla(r,then){ const ch=$("ch"); if(!ch) return nextEv(); const out=then?then():"";
+  ch.innerHTML=`<div class="result">${resumBatalla(r)}${out||""}</div>`; const nb=document.createElement("button"); nb.textContent="Continuar →"; nb.style.marginTop="8px"; nb.onclick=nextEv; ch.appendChild(nb); render(); }
+const polBat=()=>Math.max(1,Math.min(5,S.polvora||0));
 
 /* ---------- SETGES ---------- */
 function siege1642Text(){
@@ -1603,7 +1713,7 @@ function randomEvent(){
 function build(id,jornals){
   const o=OBRES.find(x=>x.id===id);
   let cost=obraCost(o); if(jornals) cost=Math.round(cost*0.75);
-  if(S.lliures<cost||S.obresAny>=2) return;
+  if(S.lliures<cost||S.obresAny>=obresMax()) return;
   S.lliures-=cost; S.b[id]=true; S.built.push(id); S.obresAny++;
   setTimeout(()=>{ setView("poble"); buildAnim(id).then(()=>{ if(id==="cn2") setTimeout(()=>tour3d(),5000); }); },30);
   if(jornals) S.lleialtat=clamp(S.lleialtat-5,0,100);
@@ -1687,9 +1797,9 @@ function finale(){
   addDoc("llegues");
   const sDiners=Math.min(10,Math.max(0,S.lliures)/60);
   const sLleialtat=S.lleialtat/100*20;
-  const sMem=Math.min(10,S.memories/4.5);
+  const sMem=Math.min(10,S.memories/(S.mode==="curta"?3.7:4.5));
   const sPlet=S.plet===null?0:S.plet;
-  const sDev=Math.min(10,Math.max(0,S.devocio)/3);
+  const sDev=Math.min(10,Math.max(0,S.devocio)/(S.mode==="curta"?2.8:3));
   const nMill=MILLORES.filter(M=>millFeta(M.id)).length;
   const sMill=Math.min(5,nMill*5/MILLORES.length);
   const sDef=defScore();
@@ -1754,13 +1864,13 @@ function renderActions(){
   if(S.phase==="pau"||S.phase==="guerra"){
     const mo=mareOn()?mareObra():null;
     if(mareOn()) h+=`<div class="mare-box"><h3>Consell de la mare</h3>${mareText().map(x=>`<p>${x}</p>`).join("")}<p class="note">Madalena Sulla administra la hisenda fins al 1627.</p></div>`;
-    h+=`<h2>Obres de l'any <span class="note">(${S.obresAny}/2)</span></h2>`;
+    h+=`<h2>Obres de l'any <span class="note">(${S.obresAny}/${obresMax()})</span></h2>`;
     OBRES.forEach(o=>{
       if(S.b[o.id]){ h+=`<div class="obra done"><div class="t"><span>${o.nom}</span><span>✔</span></div></div>`; return; }
       const ok=o.req(S); const oc=obraCost(o); const j=Math.round(oc*0.75);
       h+=`<div class="obra${mo&&mo.id===o.id?" mare":""}"><div class="t"><span>${o.nom}</span><span>${oc} ll${oc<o.cost?" <span class='note'>(amb bigues pròpies)</span>":""}</span></div>${mo&&mo.id===o.id?`<div class="mtip">La vostra mare us aconsella aquesta obra.</div>`:""}<div class="d">${o.desc}</div><div class="f">${o.font}${o.def?` · defensa +${o.def}`:""}${o.income?` · +${o.income} ll/any`:""}</div>`;
       if(!ok) h+=`<div class="note">${o.reqtxt}</div>`;
-      else h+=`<div class="btns" style="margin-top:6px"><button class="b" ${S.lliures<oc||S.obresAny>=2?"disabled":""} onclick="build('${o.id}',false)">Pagar ${oc} ll</button><button class="b alt" ${S.lliures<j||S.obresAny>=2?"disabled":""} onclick="build('${o.id}',true)" title="Els vassalls acodeixen per sa tanda: −5 lleialtat">Amb jornals dels vassalls: ${j} ll</button></div>`;
+      else h+=`<div class="btns" style="margin-top:6px"><button class="b" ${S.lliures<oc||S.obresAny>=obresMax()?"disabled":""} onclick="build('${o.id}',false)">Pagar ${oc} ll</button><button class="b alt" ${S.lliures<j||S.obresAny>=obresMax()?"disabled":""} onclick="build('${o.id}',true)" title="Els vassalls acodeixen per sa tanda: −5 lleialtat">Amb jornals dels vassalls: ${j} ll</button></div>`;
       h+=`</div>`;
     });
     h+=millSection();
@@ -1820,7 +1930,7 @@ function rumorBox(y){
   return `<div style="margin:0 0 10px;border:1px dashed var(--line);border-radius:4px;padding:7px 10px;background:var(--paper2)"><div style="font-family:'IM Fell English SC',serif;font-size:15px">Rumors al mercat de Tremp · ${y}</div><p style="margin:3px 0;font-style:italic">«${r.r}»</p><p class="note" style="margin:0"><b>Què passava de fet:</b> ${r.f} <span title="Història general de Catalunya, no del Llibre de memòries">(història general)</span></p></div>`;
 }
 function millSection(){
-  let h=`<h2>Millores al terme <span class="note">(${S.milloraAny?1:0}/1)</span></h2>`;
+  let h=`<h2>Millores al terme <span class="note">(${S.milloraAny|0}/${millMax()})</span></h2>`;
   if(S.phase!=="pau"){ const n=MILLORES.filter(M=>millFeta(M.id)).length; return h+`<p class="note">Amb la guerra ja no es poden fer millores, i les que heu fet rendeixen la meitat.${n?` En teniu ${n} de ${MILLORES.length}.`:""}</p>`; }
   h+=`<p class="note">Joseph les va deixar escrites per als successors, «quant Deu vulla tingam quietut» (f. 30–32v). Vós les podeu fer abans de la guerra. Una millora l'any.</p>`;
   MILLORES.forEach(M=>{
@@ -4448,11 +4558,22 @@ function intro(){
   <p>Teniu setze anys de pau per fer-lo fort. Després arribarà la guerra dels Segadors: un llamp, un setge, una explosió, quatre canvis de mans… Tot això va passar de debò, i Joseph ho va deixar escrit al seu llibre de memòries.</p>
   <p class="note">No podeu canviar la història, però sí decidir com us hi prepareu. Al final, el que hàgiu fet i escrit serà el vostre llegat.</p>
   ${(()=>{const g=savedGame(); return g&&g.score===null&&g.year>1624?`<button class="b big" id="cont" style="background:#4d6b3a">Continuar la partida desada (any ${g.year})</button>`:"";})()}
+  <div class="opcions">
+    <div class="og"><span class="ot">Durada</span>
+      <label><input type="radio" name="mode" value="completa" checked> <b>Completa</b><small>uns 100 esdeveniments · ≈ 81 minuts</small></label>
+      <label><input type="radio" name="mode" value="curta"> <b>Curta</b><small>45 fets essencials; la resta es resolen sols i els anys de pau passen de dos en dos · ≈ 50 minuts</small></label></div>
+    <div class="og"><span class="ot">Batalles</span>
+      <label><input type="radio" name="bat" value="si" checked> <b>Sí</b><small>als quatre setges podreu jugar la batalla en 3D (o deixar-la passar)</small></label>
+      <label><input type="radio" name="bat" value="no"> <b>No</b><small>els setges s'expliquen sense jugar-los</small></label></div>
+  </div>
   <button class="b big" id="start">${savedGame()?"Començar una partida nova":"Prendre possessió del castell"}</button>
   <button class="b alt" style="width:100%;margin-top:6px" id="hascode">Tinc un codi de partida</button>
   <p class="note" style="text-align:center;margin-top:10px">Recerca històrica: Gabriel Nicolau · <a href="#" onclick="showCredits();return false">crèdits</a></p>`;
   $("modal").classList.add("on");
-  $("start").onclick=()=>{ clearSave(); S=fresh(); queue=[]; render(); startYear(); };
+  $("start").onclick=()=>{ const v=n=>{ const r=document.querySelector(`input[name=${n}]:checked`); return r&&r.value; };
+    clearSave(); S=fresh(); S.mode=v("mode")||"completa"; S.batalles=v("bat")||"si"; queue=[]; render();
+    if(typeof gcEv==="function") gcEv("mode-"+S.mode+"-bat-"+S.batalles,"Partida "+S.mode+(S.batalles==="si"?" amb":" sense")+" batalles");
+    startYear(); };
   $("hascode").onclick=showCodeLoad;
   if($("cont")) $("cont").onclick=()=>{ loadState(savedGame()); };
 }
